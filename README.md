@@ -51,30 +51,30 @@ Use the BLoC in your widget tree with BlocProvider and BlocBuilder.
 3. Project Structure 
 
 lib/ </br>
-├── data/
-│   ├── models/
-│   ├── repositories/
-│   ├── datasources/
-├── domain/
-│   ├── entities/
-│   ├── usecases/
-│   ├── repositories/
-├── presentation/
-│   ├── bloc/
-│   ├── widgets/
-│   ├── screens/
+├── data/</br>
+│   ├── models/</br>
+│   ├── repositories/</br>
+│   ├── datasources/</br>
+├── domain/</br>
+│   ├── entities/</br>
+│   ├── usecases/</br>
+│   ├── repositories/</br>
+├── presentation/</br>
+│   ├── bloc/</br>
+│   ├── widgets/</br>
+│   ├── screens/</br>
 
-Key Concepts in BLoC
+4 Key Concepts in BLoC
 
-## Events:
+###Events:
 Represent user actions or triggers in the app.
 Examples: Button press, API call, etc.
-## States:
+### States:
 Represent the current state of the UI.
 Examples: Loading, Loaded, Error, etc.
-## Bloc:
+### Bloc:
 the business logic layer that maps events to states.
-##Repository:
+### Repository:
 Handles data-related tasks like API calls or database interactions.
-## BlocProvider:
+### BlocProvider:
 Injects the Bloc into the widget tree so it can be accessed by descendants.
