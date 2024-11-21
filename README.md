@@ -47,3 +47,34 @@ To use the BLoC in your application:
 Create a CounterBloc class that extends Bloc from the flutter_bloc package.
 Define events and states for the BLoC.
 Use the BLoC in your widget tree with BlocProvider and BlocBuilder. 
+
+3. Project Structure 
+
+lib/
+├── data/
+│   ├── models/
+│   ├── repositories/
+│   ├── datasources/
+├── domain/
+│   ├── entities/
+│   ├── usecases/
+│   ├── repositories/
+├── presentation/
+│   ├── bloc/
+│   ├── widgets/
+│   ├── screens/
+
+Key Concepts in BLoC
+
+	1.	Events:
+	•	Represent user actions or triggers in the app.
+	•	Examples: Button press, API call, etc.
+	2.	States:
+	•	Represent the current state of the UI.
+	•	Examples: Loading, Loaded, Error, etc.
+	3.	Bloc:
+	•	The business logic layer that maps events to states.
+	4.	Repository:
+	•	Handles data-related tasks like API calls or database interactions.
+	5.	BlocProvider:
+	•	Injects the Bloc into the widget tree so it can be accessed by descendants.
