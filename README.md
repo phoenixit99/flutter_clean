@@ -50,7 +50,7 @@ Use the BLoC in your widget tree with BlocProvider and BlocBuilder.
 
 3. Project Structure 
 
-lib/ </br>
+lib/</br>
 ├── data/</br>
 │   ├── models/</br>
 │   ├── repositories/</br>
@@ -66,7 +66,7 @@ lib/ </br>
 
 4 Key Concepts in BLoC
 
-###Events:
+### Events:
 Represent user actions or triggers in the app.
 Examples: Button press, API call, etc.
 ### States:
