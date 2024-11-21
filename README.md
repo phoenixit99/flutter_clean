@@ -52,17 +52,17 @@ Use the BLoC in your widget tree with BlocProvider and BlocBuilder.
 
 lib/</br>
 ├── data/</br>
-│   ├── models/</br>
-│   ├── repositories/</br>
-│   ├── datasources/</br>
+ │   ├── models/</br>
+ │   ├── repositories/</br>
+ │   ├── datasources/</br>
 ├── domain/</br>
-│   ├── entities/</br>
-│   ├── usecases/</br>
-│   ├── repositories/</br>
+ │   ├── entities/</br>
+ │   ├── usecases/</br>
+ │   ├── repositories/</br>
 ├── presentation/</br>
-│   ├── bloc/</br>
-│   ├── widgets/</br>
-│   ├── screens/</br>
+ │   ├── bloc/</br>
+ │   ├── widgets/</br>
+ │   ├── screens/</br>
 
 4 Key Concepts in BLoC
 
