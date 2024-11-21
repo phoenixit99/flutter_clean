@@ -50,31 +50,36 @@ Use the BLoC in your widget tree with BlocProvider and BlocBuilder.
 
 3. Project Structure 
 
-lib/</br>
-├── data/</br>
- │   ├── models/</br>
- │   ├── repositories/</br>
- │   ├── datasources/</br>
-├── domain/</br>
- │   ├── entities/</br>
- │   ├── usecases/</br>
- │   ├── repositories/</br>
-├── presentation/</br>
- │   ├── bloc/</br>
- │   ├── widgets/</br>
- │   ├── screens/</br>
+lib/
+├── data/
+│   ├── models/          # Data models that represent API responses or database structures.
+│   ├── repositories/    # Implementation of repositories that interact with data sources.
+│   ├── datasources/     # Sources of data, such as APIs or local databases.
+├── domain/
+│   ├── entities/        # Core application entities (plain Dart objects, business rules).
+│   ├── usecases/        # Business logic (one use case per file).
+│   ├── repositories/    # Abstract definitions of repositories (implemented in the data layer).
+├── presentation/
+│   ├── bloc/            # BLoC (Business Logic Components) for managing UI states.
+│   ├── widgets/         # Reusable UI components.
+│   ├── screens/         # Screens for various parts of the app (e.g., Login, Home, Profile).
 
-4 Key Concepts in BLoC
+Explanation of Layers
 
-### Events:
-Represent user actions or triggers in the app.
-Examples: Button press, API call, etc.
-### States:
-Represent the current state of the UI.
-Examples: Loading, Loaded, Error, etc.
-### Bloc:
-the business logic layer that maps events to states.
-### Repository:
-Handles data-related tasks like API calls or database interactions.
-### BlocProvider:
-Injects the Bloc into the widget tree so it can be accessed by descendants.
+1. Data Layer
+
+	•	models/: Contains classes that represent data structures (e.g., JSON models for APIs or database schemas).
+	•	datasources/: Defines where data comes from (e.g., remote APIs, local databases, or mock data).
+	•	repositories/: Implements the domain repositories by combining data from data sources.
+
+2. Domain Layer
+
+	•	entities/: Defines core business objects used across the app. These are independent of the UI and data source.
+	•	usecases/: Encapsulates specific application functionality, such as “Log in User” or “Fetch Profile Details.”
+	•	repositories/: Abstract interfaces for repositories, implemented in the data layer.
+
+3. Presentation Layer
+
+	•	bloc/: Manages the application’s state and logic, handling user interactions and data flow.
+	•	widgets/: Reusable UI components such as buttons, cards, or input fields.
+	•	screens/: Complete screens/views for various parts of the app.
