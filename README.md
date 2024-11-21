@@ -26,7 +26,7 @@ To get started with this sample project, follow these steps:
 
    ```bash
    git clone https://github.com/phoenixit99/flutter_clean.git
-   cd flutter_clean ```
+   cd flutter_clean 
    
 2. Install dependencies: Ensure you have Flutter installed. Run the following command to get the required packages:
 bash
