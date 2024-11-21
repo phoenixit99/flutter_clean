@@ -49,7 +49,7 @@ Define events and states for the BLoC.
 Use the BLoC in your widget tree with BlocProvider and BlocBuilder. 
 
 3. Project Structure 
-
+```
 lib/
 ├── data/
 │   ├── models/          # Data models that represent API responses or database structures.
@@ -63,7 +63,7 @@ lib/
 │   ├── bloc/            # BLoC (Business Logic Components) for managing UI states.
 │   ├── widgets/         # Reusable UI components.
 │   ├── screens/         # Screens for various parts of the app (e.g., Login, Home, Profile).
-
+```
 Explanation of Layers
 
 1. Data Layer
