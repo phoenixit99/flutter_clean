@@ -11,12 +11,14 @@ class LoginScreen extends StatelessWidget {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
+  LoginScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => LoginBloc(AuthUsecase(AuthRepositoryImpl(AuthDatasource()))),
       child: Scaffold(
-        appBar: AppBar(title: Text("Login")),
+        appBar: AppBar(title: const Text("Login")),
         body: BlocListener<LoginBloc, LoginState>(
           listener: (context, state) {
             if (state is LoginSuccess) {
@@ -32,7 +34,7 @@ class LoginScreen extends StatelessWidget {
           child: BlocBuilder<LoginBloc, LoginState>(
             builder: (context, state) {
               if (state is LoginLoading) {
-                return Center(child: CircularProgressIndicator());
+                return const Center(child: CircularProgressIndicator());
               }
               return Padding(
                 padding: const EdgeInsets.all(16.0),
@@ -40,14 +42,14 @@ class LoginScreen extends StatelessWidget {
                   children: [
                     TextField(
                       controller: emailController,
-                      decoration: InputDecoration(labelText: "Email"),
+                      decoration: const InputDecoration(labelText: "Email"),
                     ),
                     TextField(
                       controller: passwordController,
-                      decoration: InputDecoration(labelText: "Password"),
+                      decoration: const InputDecoration(labelText: "Password"),
                       obscureText: true,
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     ElevatedButton(
                       onPressed: () {
                         context.read<LoginBloc>().add(
@@ -57,7 +59,7 @@ class LoginScreen extends StatelessWidget {
                               ),
                             );
                       },
-                      child: Text("Login"),
+                      child: const Text("Login"),
                     ),
                   ],
                 ),
