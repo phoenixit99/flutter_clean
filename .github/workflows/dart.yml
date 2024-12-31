@@ -73,4 +73,24 @@ jobs:
             ${{ github.event.pull_request.body }}
             ```
 
+      - name: Send Discord notification
+        uses: Ilshidur/action-discord@master
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        with:
+          args: |
+            🎉 **Pull Request Merged!**
+            
+            **PR Title:** ${{ github.event.pull_request.title }}
+            **Merged by:** ${{ github.event.pull_request.merged_by.login }}
+            **Repository:** ${{ github.repository }}
+            **Branch:** ${{ github.event.pull_request.base.ref }}
+            
+            [View Pull Request](${{ github.event.pull_request.html_url }})
+            
+            **Changes Summary:**
+            ```
+            ${{ github.event.pull_request.body }}
+            ```
+
       # Previous notification methods can be removed or kept as fallback
