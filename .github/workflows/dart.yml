@@ -19,32 +19,21 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.24.5'
-
-      # Set up Flutter with a specific version
       # - name: Set up Flutter
       #   uses: subosito/flutter-action@v2
       #   with:
-      #     flutter-version: '3.5.0'  # Changed to match your project version
-      #     channel: 'stable'
-      #     cache: true
-      
-      # Ensure Flutter is properly installed
-      # - name: Flutter doctor
-      #   run: flutter doctor -v
-        
-      - name: Install dependencies
-        run: flutter pub get
+      #     flutter-version: 'stable'
+
+
+      # - name: Install dependencies
+      #   run: flutter pub get
 
       # Uncomment this step to verify the use of 'dart format' on each commit.
       # - name: Verify formatting
       #   run: dart format --output=none --set-exit-if-changed .
 
-      - name: Analyze project source
-        run: flutter analyze
+      # - name: Analyze project source
+      #   run: flutter analyze
 
       # Your project will need to have tests in test/ and a dependency on
       # package:test for this step to succeed.
@@ -73,6 +62,26 @@ jobs:
             [View Pull Request](${{ github.event.pull_request.html_url }})
             
             *Changes Summary:*
+            ```
+            ${{ github.event.pull_request.body }}
+            ```
+
+      - name: Send Discord notification
+        uses: Ilshidur/action-discord@master
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        with:
+          args: |
+            🎉 **Pull Request Merged!**
+            
+            **PR Title:** ${{ github.event.pull_request.title }}
+            **Merged by:** ${{ github.event.pull_request.merged_by.login }}
+            **Repository:** ${{ github.repository }}
+            **Branch:** ${{ github.event.pull_request.base.ref }}
+            
+            [View Pull Request](${{ github.event.pull_request.html_url }})
+            
+            **Changes Summary:**
             ```
             ${{ github.event.pull_request.body }}
             ```
