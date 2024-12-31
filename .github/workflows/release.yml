@@ -1,9 +1,8 @@
-name: Linux Release Build
+name: Desktop Release Build
 
-# Add permissions at the top level
 permissions:
-  contents: write      # Required for creating releases
-  pull-requests: read # Required for reading PR information
+  contents: write
+  pull-requests: read
 
 on:
   pull_request_target:
@@ -11,10 +10,44 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build-and-release:
+  build-windows:
+    if: github.event.pull_request.merged == true
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Enable Windows desktop
+        run: flutter config --enable-windows-desktop
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Build application
+        run: flutter build windows --release
+
+      - name: Archive Release
+        uses: thedoctor0/zip-release@master
+        with:
+          type: 'zip'
+          filename: 'windows-build.zip'
+          directory: build/windows/runner/Release
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: windows-build
+          path: build/windows/runner/Release/windows-build.zip
+
+  build-linux:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -56,13 +89,18 @@ jobs:
           path: build/linux/x64/release/bundle/linux-build.zip
 
   create-release:
-    needs: build-and-release
+    needs: [build-windows, build-linux]
     runs-on: ubuntu-latest
     permissions:
-      contents: write  # Add permissions at job level
+      contents: write
     
     steps:
-      - name: Download artifact
+      - name: Download Windows artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: windows-build
+
+      - name: Download Linux artifact
         uses: actions/download-artifact@v3
         with:
           name: linux-build
@@ -74,18 +112,20 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: release-${{ github.run_number }}
-          release_name: Release ${{ github.run_number }}
+          release_name: Desktop Release ${{ github.run_number }}
           body: |
-            New Linux release from merged PR #${{ github.event.pull_request.number }}
+            New Desktop release from merged PR #${{ github.event.pull_request.number }}
             ${{ github.event.pull_request.title }}
           draft: false
           prerelease: false
 
-      - name: Upload Release Asset
+      - name: Upload Release Assets
         uses: softprops/action-gh-release@v1
         with:
           tag_name: release-${{ github.run_number }}
-          files: linux-build.zip
+          files: |
+            windows-build.zip
+            linux-build.zip
 
   notify-release:
     needs: create-release
@@ -98,13 +138,15 @@ jobs:
           token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           format: markdown
           message: |
-            🚀 *New Linux Release Published!*
+            🚀 *New Desktop Release Published!*
             
             Version: Release ${{ github.run_number }}
             PR: #${{ github.event.pull_request.number }} - ${{ github.event.pull_request.title }}
+            Requested by: ${{ github.event.pull_request.user.login }}
             Merged by: ${{ github.event.pull_request.merged_by.login }}
             
-            *Download Link:*
+            *Download Links:*
+            [Windows Build](https://github.com/${{ github.repository }}/releases/download/release-${{ github.run_number }}/windows-build.zip)
             [Linux Build](https://github.com/${{ github.repository }}/releases/download/release-${{ github.run_number }}/linux-build.zip)
             
             [View Release](https://github.com/${{ github.repository }}/releases/tag/release-${{ github.run_number }})
@@ -115,13 +157,15 @@ jobs:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         with:
           args: |
-            🚀 **New Linux Release Published!**
+            🚀 **New Desktop Release Published!**
             
             Version: Release ${{ github.run_number }}
             PR: #${{ github.event.pull_request.number }} - ${{ github.event.pull_request.title }}
+            Requested by: ${{ github.event.pull_request.user.login }}
             Merged by: ${{ github.event.pull_request.merged_by.login }}
             
-            **Download Link:**
+            **Download Links:**
+            [Windows Build](https://github.com/${{ github.repository }}/releases/download/release-${{ github.run_number }}/windows-build.zip)
             [Linux Build](https://github.com/${{ github.repository }}/releases/download/release-${{ github.run_number }}/linux-build.zip)
             
             [View Release](https://github.com/${{ github.repository }}/releases/tag/release-${{ github.run_number }}) 
