@@ -214,4 +214,108 @@ jobs:
             **Download Link:**
             [Windows Build](https://github.com/${{ github.repository }}/releases/download/windows-release-${{ github.run_number }}/windows-build.zip)
             
-            [View Release](https://github.com/${{ github.repository }}/releases/tag/windows-release-${{ github.run_number }}) 
+            [View Release](https://github.com/${{ github.repository }}/releases/tag/windows-release-${{ github.run_number }})
+
+  build-and-release-macos:
+    if: github.event.pull_request.merged == true
+    runs-on: macos-latest
+    outputs:
+      release_tag: macos-release-${{ github.run_number }}
+      platform: macOS
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Enable macOS desktop
+        run: flutter config --enable-macos-desktop
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Build application
+        run: |
+          flutter doctor -v
+          flutter build macos --release
+          ls build/macos/Build/Products/Release
+
+      - name: Verify build directory
+        run: |
+          if [ -d "build/macos/Build/Products/Release" ]; then
+            echo "✓ Build directory exists"
+            ls -la build/macos/Build/Products/Release
+          else
+            echo "× Build directory not found"
+            exit 1
+          fi
+
+      - name: Archive Release
+        run: |
+          cd build/macos/Build/Products/Release
+          zip -r macos-build.zip *.app
+
+      - name: Create macOS Release
+        id: create_macos_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: macos-release-${{ github.run_number }}
+          release_name: macOS Release ${{ github.run_number }}
+          body: |
+            macOS release from merged PR #${{ github.event.pull_request.number }}
+            ${{ github.event.pull_request.title }}
+          draft: false
+          prerelease: false
+
+      - name: Upload macOS Release Asset
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: macos-release-${{ github.run_number }}
+          files: build/macos/Build/Products/Release/macos-build.zip
+
+  notify-macos:
+    needs: build-and-release-macos
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Telegram Notification
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_CHAT_ID }}
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          format: markdown
+          message: |
+            🚀 *macOS Release Published!*
+            
+            Version: macOS Release ${{ github.run_number }}
+            PR: #${{ github.event.pull_request.number }} - ${{ github.event.pull_request.title }}
+            Requested by: ${{ github.event.pull_request.user.login }}
+            Merged by: ${{ github.event.pull_request.merged_by.login }}
+            
+            *Download Link:*
+            [macOS Build](https://github.com/${{ github.repository }}/releases/download/macos-release-${{ github.run_number }}/macos-build.zip)
+            
+            [View Release](https://github.com/${{ github.repository }}/releases/tag/macos-release-${{ github.run_number }})
+
+      - name: Send Discord Notification
+        uses: Ilshidur/action-discord@master
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        with:
+          args: |
+            🚀 **macOS Release Published!**
+            
+            Version: macOS Release ${{ github.run_number }}
+            PR: #${{ github.event.pull_request.number }} - ${{ github.event.pull_request.title }}
+            Requested by: ${{ github.event.pull_request.user.login }}
+            Merged by: ${{ github.event.pull_request.merged_by.login }}
+            
+            **Download Link:**
+            [macOS Build](https://github.com/${{ github.repository }}/releases/download/macos-release-${{ github.run_number }}/macos-build.zip)
+            
+            [View Release](https://github.com/${{ github.repository }}/releases/tag/macos-release-${{ github.run_number }}) 
