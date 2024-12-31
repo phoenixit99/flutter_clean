@@ -10,55 +10,12 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build-windows:
-    if: github.event.pull_request.merged == true
-    runs-on: windows-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: 'stable'
-          cache: true
-
-      - name: Enable Windows desktop
-        run: flutter config --enable-windows-desktop
-
-      - name: Get dependencies
-        run: flutter pub get
-
-      - name: Build application
-        run: |
-          flutter doctor -v
-          flutter build windows --release
-          dir build\windows\runner\Release
-
-      - name: Verify build directory
-        run: |
-          if (Test-Path "build\windows\runner\Release") {
-              echo "✓ Build directory exists"
-          } else {
-              echo "× Build directory not found"
-              exit 1
-          }
-
-      - name: Archive Release
-        shell: bash
-        run: |
-          cd build/windows/runner/Release
-          7z a -tzip windows-build.zip ./*
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: windows-build
-          path: build/windows/runner/Release/windows-build.zip
-
-  build-linux:
+  build-and-release-linux:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
+    outputs:
+      release_tag: linux-release-${{ github.run_number }}
+      platform: Linux
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -93,86 +50,168 @@ jobs:
           filename: 'linux-build.zip'
           directory: build/linux/x64/release/bundle
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: linux-build
-          path: build/linux/x64/release/bundle/linux-build.zip
-
-  create-release:
-    needs: [build-windows, build-linux]
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    
-    steps:
-      - name: Download Windows artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: windows-build
-
-      - name: Download Linux artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: linux-build
-
-      - name: Create Release
-        id: create_release
+      - name: Create Linux Release
+        id: create_linux_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: release-${{ github.run_number }}
-          release_name: Desktop Release ${{ github.run_number }}
+          tag_name: linux-release-${{ github.run_number }}
+          release_name: Linux Release ${{ github.run_number }}
           body: |
-            New Desktop release from merged PR #${{ github.event.pull_request.number }}
+            Linux release from merged PR #${{ github.event.pull_request.number }}
             ${{ github.event.pull_request.title }}
           draft: false
           prerelease: false
 
-      - name: Upload Release Assets
+      - name: Upload Linux Release Asset
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: release-${{ github.run_number }}
-          files: |
-            windows-build.zip
-            linux-build.zip
+          tag_name: linux-release-${{ github.run_number }}
+          files: build/linux/x64/release/bundle/linux-build.zip
 
-      - name: Send Telegram notification
+  notify-linux:
+    needs: build-and-release-linux
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Telegram Notification
         uses: appleboy/telegram-action@master
         with:
           to: ${{ secrets.TELEGRAM_CHAT_ID }}
           token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           format: markdown
           message: |
-            🚀 *Desktop Release Published!*
+            🚀 *Linux Release Published!*
             
-            Version: Release ${{ github.run_number }}
+            Version: Linux Release ${{ github.run_number }}
             PR: #${{ github.event.pull_request.number }} - ${{ github.event.pull_request.title }}
             Requested by: ${{ github.event.pull_request.user.login }}
             Merged by: ${{ github.event.pull_request.merged_by.login }}
             
-            *Download Links:*
-            [Windows Build](https://github.com/${{ github.repository }}/releases/download/release-${{ github.run_number }}/windows-build.zip)
-            [Linux Build](https://github.com/${{ github.repository }}/releases/download/release-${{ github.run_number }}/linux-build.zip)
+            *Download Link:*
+            [Linux Build](https://github.com/${{ github.repository }}/releases/download/linux-release-${{ github.run_number }}/linux-build.zip)
             
-            [View Release](https://github.com/${{ github.repository }}/releases/tag/release-${{ github.run_number }})
+            [View Release](https://github.com/${{ github.repository }}/releases/tag/linux-release-${{ github.run_number }})
 
-      - name: Send Discord notification
+      - name: Send Discord Notification
         uses: Ilshidur/action-discord@master
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         with:
           args: |
-            🚀 **Desktop Release Published!**
+            🚀 **Linux Release Published!**
             
-            Version: Release ${{ github.run_number }}
+            Version: Linux Release ${{ github.run_number }}
             PR: #${{ github.event.pull_request.number }} - ${{ github.event.pull_request.title }}
             Requested by: ${{ github.event.pull_request.user.login }}
             Merged by: ${{ github.event.pull_request.merged_by.login }}
             
-            **Download Links:**
-            [Windows Build](https://github.com/${{ github.repository }}/releases/download/release-${{ github.run_number }}/windows-build.zip)
-            [Linux Build](https://github.com/${{ github.repository }}/releases/download/release-${{ github.run_number }}/linux-build.zip)
+            **Download Link:**
+            [Linux Build](https://github.com/${{ github.repository }}/releases/download/linux-release-${{ github.run_number }}/linux-build.zip)
             
-            [View Release](https://github.com/${{ github.repository }}/releases/tag/release-${{ github.run_number }}) 
+            [View Release](https://github.com/${{ github.repository }}/releases/tag/linux-release-${{ github.run_number }})
+
+  build-and-release-windows:
+    if: github.event.pull_request.merged == true
+    runs-on: windows-latest
+    outputs:
+      release_tag: windows-release-${{ github.run_number }}
+      platform: Windows
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Enable Windows desktop
+        run: flutter config --enable-windows-desktop
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Build application
+        run: |
+          flutter doctor -v
+          flutter build windows --release
+          dir build\windows\x64\runner\Release
+
+      - name: Verify build directory
+        run: |
+          if (Test-Path "build\windows\x64\runner\Release") {
+              echo "✓ Build directory exists"
+              dir build\windows\x64\runner\Release
+          } else {
+              echo "× Build directory not found"
+              exit 1
+          }
+
+      - name: Archive Release
+        shell: bash
+        run: |
+          cd build/windows/x64/runner/Release
+          7z a -tzip windows-build.zip ./*
+
+      - name: Create Windows Release
+        id: create_windows_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: windows-release-${{ github.run_number }}
+          release_name: Windows Release ${{ github.run_number }}
+          body: |
+            Windows release from merged PR #${{ github.event.pull_request.number }}
+            ${{ github.event.pull_request.title }}
+          draft: false
+          prerelease: false
+
+      - name: Upload Windows Release Asset
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: windows-release-${{ github.run_number }}
+          files: build/windows/x64/runner/Release/windows-build.zip
+
+  notify-windows:
+    needs: build-and-release-windows
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Telegram Notification
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_CHAT_ID }}
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          format: markdown
+          message: |
+            🚀 *Windows Release Published!*
+            
+            Version: Windows Release ${{ github.run_number }}
+            PR: #${{ github.event.pull_request.number }} - ${{ github.event.pull_request.title }}
+            Requested by: ${{ github.event.pull_request.user.login }}
+            Merged by: ${{ github.event.pull_request.merged_by.login }}
+            
+            *Download Link:*
+            [Windows Build](https://github.com/${{ github.repository }}/releases/download/windows-release-${{ github.run_number }}/windows-build.zip)
+            
+            [View Release](https://github.com/${{ github.repository }}/releases/tag/windows-release-${{ github.run_number }})
+
+      - name: Send Discord Notification
+        uses: Ilshidur/action-discord@master
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        with:
+          args: |
+            🚀 **Windows Release Published!**
+            
+            Version: Windows Release ${{ github.run_number }}
+            PR: #${{ github.event.pull_request.number }} - ${{ github.event.pull_request.title }}
+            Requested by: ${{ github.event.pull_request.user.login }}
+            Merged by: ${{ github.event.pull_request.merged_by.login }}
+            
+            **Download Link:**
+            [Windows Build](https://github.com/${{ github.repository }}/releases/download/windows-release-${{ github.run_number }}/windows-build.zip)
+            
+            [View Release](https://github.com/${{ github.repository }}/releases/tag/windows-release-${{ github.run_number }}) 
