@@ -101,7 +101,8 @@ jobs:
             🚀 *New Linux Release Published!*
             
             Version: Release ${{ github.run_number }}
-            PR: #${{ github.event.pull_request.number }}
+            PR: #${{ github.event.pull_request.number }} - ${{ github.event.pull_request.title }}
+            Merged by: ${{ github.event.pull_request.merged_by.login }}
             
             *Download Link:*
             [Linux Build](https://github.com/${{ github.repository }}/releases/download/release-${{ github.run_number }}/linux-build.zip)
@@ -117,7 +118,8 @@ jobs:
             🚀 **New Linux Release Published!**
             
             Version: Release ${{ github.run_number }}
-            PR: #${{ github.event.pull_request.number }}
+            PR: #${{ github.event.pull_request.number }} - ${{ github.event.pull_request.title }}
+            Merged by: ${{ github.event.pull_request.merged_by.login }}
             
             **Download Link:**
             [Linux Build](https://github.com/${{ github.repository }}/releases/download/release-${{ github.run_number }}/linux-build.zip)
