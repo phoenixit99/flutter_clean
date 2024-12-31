@@ -10,20 +10,21 @@ jobs:
     if: github.event.pull_request.merged == true
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        # os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu-latest]
         include:
           - os: ubuntu-latest
             build-type: linux
             artifact-name: linux-build
             artifact-path: build/linux/x64/release/bundle
-          - os: windows-latest
-            build-type: windows
-            artifact-name: windows-build
-            artifact-path: build/windows/runner/Release
-          - os: macos-latest
-            build-type: macos
-            artifact-name: macos-build
-            artifact-path: build/macos/Build/Products/Release
+        #   - os: windows-latest
+        #     build-type: windows
+        #     artifact-name: windows-build
+        #     artifact-path: build/windows/runner/Release
+        #   - os: macos-latest
+        #     build-type: macos
+        #     artifact-name: macos-build
+        #     artifact-path: build/macos/Build/Products/Release
 
     runs-on: ${{ matrix.os }}
 
@@ -46,11 +47,11 @@ jobs:
           sudo apt-get install -y libblkid-dev
           sudo apt-get install -y liblzma-dev
 
-      - name: Enable desktop support
-        run: |
-          flutter config --enable-windows-desktop
-          flutter config --enable-macos-desktop
-          flutter config --enable-linux-desktop
+    #   - name: Enable desktop support
+    #     run: |
+    #       flutter config --enable-windows-desktop
+    #       flutter config --enable-macos-desktop
+    #       flutter config --enable-linux-desktop
 
       - name: Get dependencies
         run: flutter pub get

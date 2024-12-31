@@ -30,50 +30,50 @@ jobs:
         run: flutter analyze
 
 
-  notify-on-merge:
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request_target' && github.event.pull_request.merged == true
+  # notify-on-merge:
+  #   runs-on: ubuntu-latest
+  #   if: github.event_name == 'pull_request_target' && github.event.pull_request.merged == true
     
-    steps:
-      - name: Send Telegram notification
-        uses: appleboy/telegram-action@master
-        with:
-          to: ${{ secrets.TELEGRAM_CHAT_ID }}
-          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          format: markdown
-          message: |
-            🎉 *Pull Request Merged!*
+  #   steps:
+  #     - name: Send Telegram notification
+  #       uses: appleboy/telegram-action@master
+  #       with:
+  #         to: ${{ secrets.TELEGRAM_CHAT_ID }}
+  #         token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+  #         format: markdown
+  #         message: |
+  #           🎉 *Pull Request Merged!*
             
-            *PR Title:* ${{ github.event.pull_request.title }}
-            *Merged by:* ${{ github.event.pull_request.merged_by.login }}
-            *Repository:* ${{ github.repository }}
-            *Branch:* ${{ github.event.pull_request.base.ref }}
+  #           *PR Title:* ${{ github.event.pull_request.title }}
+  #           *Merged by:* ${{ github.event.pull_request.merged_by.login }}
+  #           *Repository:* ${{ github.repository }}
+  #           *Branch:* ${{ github.event.pull_request.base.ref }}
             
-            [View Pull Request](${{ github.event.pull_request.html_url }})
+  #           [View Pull Request](${{ github.event.pull_request.html_url }})
             
-            *Changes Summary:*
-            ```
-            ${{ github.event.pull_request.body }}
-            ```
+  #           *Changes Summary:*
+  #           ```
+  #           ${{ github.event.pull_request.body }}
+  #           ```
 
-      - name: Send Discord notification
-        uses: Ilshidur/action-discord@master
-        env:
-          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
-        with:
-          args: |
-            🎉 **Pull Request Merged!**
+  #     - name: Send Discord notification
+  #       uses: Ilshidur/action-discord@master
+  #       env:
+  #         DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+  #       with:
+  #         args: |
+  #           🎉 **Pull Request Merged!**
             
-            **PR Title:** ${{ github.event.pull_request.title }}
-            **Merged by:** ${{ github.event.pull_request.merged_by.login }}
-            **Repository:** ${{ github.repository }}
-            **Branch:** ${{ github.event.pull_request.base.ref }}
+  #           **PR Title:** ${{ github.event.pull_request.title }}
+  #           **Merged by:** ${{ github.event.pull_request.merged_by.login }}
+  #           **Repository:** ${{ github.repository }}
+  #           **Branch:** ${{ github.event.pull_request.base.ref }}
             
-            [View Pull Request](${{ github.event.pull_request.html_url }})
+  #           [View Pull Request](${{ github.event.pull_request.html_url }})
             
-            **Changes Summary:**
-            ```
-            ${{ github.event.pull_request.body }}
-            ```
+  #           **Changes Summary:**
+  #           ```
+  #           ${{ github.event.pull_request.body }}
+  #           ```
 
       # Previous notification methods can be removed or kept as fallback
