@@ -83,15 +83,15 @@ jobs:
           message: |
             🚀 *Linux Release Published!*
             
-            Version: Linux Release ${{ github.run_number }}
-            PR: #${{ github.event.pull_request.number }} - ${{ github.event.pull_request.title }}
-            Requested by: ${{ github.event.pull_request.user.login }}
-            Merged by: ${{ github.event.pull_request.merged_by.login }}
+            📦 Version: Linux Release ${{ github.run_number }}
+            🔄 PR: #${{ github.event.pull_request.number }} - ${{ github.event.pull_request.title }}
+            👤 Requested by: ${{ github.event.pull_request.user.login }}
+            ✅ Merged by: ${{ github.event.pull_request.merged_by.login }}
             
-            *Download Link:*
+            📥 *Download Link:*
             [Linux Build](https://github.com/${{ github.repository }}/releases/download/linux-release-${{ github.run_number }}/linux-build.zip)
             
-            [View Release](https://github.com/${{ github.repository }}/releases/tag/linux-release-${{ github.run_number }})
+            🔍 [View Release](https://github.com/${{ github.repository }}/releases/tag/linux-release-${{ github.run_number }})
 
       - name: Send Discord Notification
         uses: Ilshidur/action-discord@master
@@ -101,15 +101,15 @@ jobs:
           args: |
             🚀 **Linux Release Published!**
             
-            Version: Linux Release ${{ github.run_number }}
-            PR: #${{ github.event.pull_request.number }} - ${{ github.event.pull_request.title }}
-            Requested by: ${{ github.event.pull_request.user.login }}
-            Merged by: ${{ github.event.pull_request.merged_by.login }}
+            📦 Version: Linux Release ${{ github.run_number }}
+            🔄 PR: #${{ github.event.pull_request.number }} - ${{ github.event.pull_request.title }}
+            👤 Requested by: ${{ github.event.pull_request.user.login }}
+            ✅ Merged by: ${{ github.event.pull_request.merged_by.login }}
             
-            **Download Link:**
+            📥 *Download Link:*
             [Linux Build](https://github.com/${{ github.repository }}/releases/download/linux-release-${{ github.run_number }}/linux-build.zip)
             
-            [View Release](https://github.com/${{ github.repository }}/releases/tag/linux-release-${{ github.run_number }})
+            🔍 [View Release](https://github.com/${{ github.repository }}/releases/tag/linux-release-${{ github.run_number }})
 
   build-and-release-windows:
     if: github.event.pull_request.merged == true
@@ -188,15 +188,15 @@ jobs:
           message: |
             🚀 *Windows Release Published!*
             
-            Version: Windows Release ${{ github.run_number }}
-            PR: #${{ github.event.pull_request.number }} - ${{ github.event.pull_request.title }}
-            Requested by: ${{ github.event.pull_request.user.login }}
-            Merged by: ${{ github.event.pull_request.merged_by.login }}
+            📦 Version: Windows Release ${{ github.run_number }}
+            🔄 PR: #${{ github.event.pull_request.number }} - ${{ github.event.pull_request.title }}
+            👤 Requested by: ${{ github.event.pull_request.user.login }}
+            ✅ Merged by: ${{ github.event.pull_request.merged_by.login }}
             
-            *Download Link:*
+            📥 *Download Link:*
             [Windows Build](https://github.com/${{ github.repository }}/releases/download/windows-release-${{ github.run_number }}/windows-build.zip)
             
-            [View Release](https://github.com/${{ github.repository }}/releases/tag/windows-release-${{ github.run_number }})
+            🔍 [View Release](https://github.com/${{ github.repository }}/releases/tag/windows-release-${{ github.run_number }})
 
       - name: Send Discord Notification
         uses: Ilshidur/action-discord@master
@@ -206,15 +206,15 @@ jobs:
           args: |
             🚀 **Windows Release Published!**
             
-            Version: Windows Release ${{ github.run_number }}
-            PR: #${{ github.event.pull_request.number }} - ${{ github.event.pull_request.title }}
-            Requested by: ${{ github.event.pull_request.user.login }}
-            Merged by: ${{ github.event.pull_request.merged_by.login }}
+                    📦 Version: Windows Release ${{ github.run_number }}
+            🔄 PR: #${{ github.event.pull_request.number }} - ${{ github.event.pull_request.title }}
+            👤 Requested by: ${{ github.event.pull_request.user.login }}
+            ✅ Merged by: ${{ github.event.pull_request.merged_by.login }}
             
-            **Download Link:**
+            📥 *Download Link:*
             [Windows Build](https://github.com/${{ github.repository }}/releases/download/windows-release-${{ github.run_number }}/windows-build.zip)
             
-            [View Release](https://github.com/${{ github.repository }}/releases/tag/windows-release-${{ github.run_number }})
+            🔍 [View Release](https://github.com/${{ github.repository }}/releases/tag/windows-release-${{ github.run_number }})
 
   build-and-release-macos:
     if: github.event.pull_request.merged == true
@@ -292,15 +292,15 @@ jobs:
           message: |
             🚀 *macOS Release Published!*
             
-            Version: macOS Release ${{ github.run_number }}
-            PR: #${{ github.event.pull_request.number }} - ${{ github.event.pull_request.title }}
-            Requested by: ${{ github.event.pull_request.user.login }}
-            Merged by: ${{ github.event.pull_request.merged_by.login }}
+            📦 Version: macOS Release ${{ github.run_number }}
+            🔄 PR: #${{ github.event.pull_request.number }} - ${{ github.event.pull_request.title }}
+            👤 Requested by: ${{ github.event.pull_request.user.login }}
+            ✅ Merged by: ${{ github.event.pull_request.merged_by.login }}
             
-            *Download Link:*
+            📥 *Download Link:*
             [macOS Build](https://github.com/${{ github.repository }}/releases/download/macos-release-${{ github.run_number }}/macos-build.zip)
             
-            [View Release](https://github.com/${{ github.repository }}/releases/tag/macos-release-${{ github.run_number }})
+            🔍 [View Release](https://github.com/${{ github.repository }}/releases/tag/macos-release-${{ github.run_number }})
 
       - name: Send Discord Notification
         uses: Ilshidur/action-discord@master
@@ -310,12 +310,12 @@ jobs:
           args: |
             🚀 **macOS Release Published!**
             
-            Version: macOS Release ${{ github.run_number }}
-            PR: #${{ github.event.pull_request.number }} - ${{ github.event.pull_request.title }}
-            Requested by: ${{ github.event.pull_request.user.login }}
-            Merged by: ${{ github.event.pull_request.merged_by.login }}
+            📦 Version: macOS Release ${{ github.run_number }}
+            🔄 PR: #${{ github.event.pull_request.number }} - ${{ github.event.pull_request.title }}
+            👤 Requested by: ${{ github.event.pull_request.user.login }}
+            ✅ Merged by: ${{ github.event.pull_request.merged_by.login }}
             
-            **Download Link:**
+            📥 *Download Link:*
             [macOS Build](https://github.com/${{ github.repository }}/releases/download/macos-release-${{ github.run_number }}/macos-build.zip)
             
-            [View Release](https://github.com/${{ github.repository }}/releases/tag/macos-release-${{ github.run_number }}) 
+            🔍 [View Release](https://github.com/${{ github.repository }}/releases/tag/macos-release-${{ github.run_number }})
