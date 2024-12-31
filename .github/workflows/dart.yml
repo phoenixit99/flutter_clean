@@ -26,20 +26,9 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      # - name: Install dependencies
-      #   run: flutter pub get
+      - name: Analyze project source
+        run: flutter analyze
 
-      # Uncomment this step to verify the use of 'dart format' on each commit.
-      # - name: Verify formatting
-      #   run: dart format --output=none --set-exit-if-changed .
-
-      # - name: Analyze project source
-      #   run: flutter analyze
-
-      # Your project will need to have tests in test/ and a dependency on
-      # package:test for this step to succeed.
-      # - name: Run tests
-      #   run: flutter test
 
   notify-on-merge:
     runs-on: ubuntu-latest

@@ -1,0 +1,144 @@
+name: Release Build
+
+on:
+  pull_request_target:
+    types: [closed]
+    branches: [ "main" ]
+
+jobs:
+  build-and-release:
+    if: github.event.pull_request.merged == true
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        include:
+          - os: ubuntu-latest
+            build-type: linux
+            artifact-name: linux-build
+            artifact-path: build/linux/x64/release/bundle
+          - os: windows-latest
+            build-type: windows
+            artifact-name: windows-build
+            artifact-path: build/windows/runner/Release
+          - os: macos-latest
+            build-type: macos
+            artifact-name: macos-build
+            artifact-path: build/macos/Build/Products/Release
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Install Linux dependencies
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build libgtk-3-dev
+          sudo apt-get install -y cmake pkg-config
+          sudo apt-get install -y libblkid-dev
+          sudo apt-get install -y liblzma-dev
+
+      - name: Enable desktop support
+        run: |
+          flutter config --enable-windows-desktop
+          flutter config --enable-macos-desktop
+          flutter config --enable-linux-desktop
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Build application
+        run: flutter build ${{ matrix.build-type }} --release
+
+      - name: Archive Release
+        uses: thedoctor0/zip-release@master
+        with:
+          type: 'zip'
+          filename: '${{ matrix.artifact-name }}.zip'
+          directory: ${{ matrix.artifact-path }}
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.artifact-name }}
+          path: ${{ matrix.artifact-path }}/${{ matrix.artifact-name }}.zip
+
+  create-release:
+    needs: build-and-release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v3
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: release-${{ github.run_number }}
+          release_name: Release ${{ github.run_number }}
+          body: |
+            New release from merged PR #${{ github.event.pull_request.number }}
+            ${{ github.event.pull_request.title }}
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Assets
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: release-${{ github.run_number }}
+          files: |
+            linux-build/*.zip
+            windows-build/*.zip
+            macos-build/*.zip
+
+  notify-release:
+    needs: create-release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Telegram notification
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_CHAT_ID }}
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          format: markdown
+          message: |
+            🚀 *New Release Published!*
+            
+            Version: Release ${{ github.run_number }}
+            PR: #${{ github.event.pull_request.number }}
+            
+            *Download Links:*
+            [Windows Build](https://github.com/${{ github.repository }}/releases/download/release-${{ github.run_number }}/windows-build.zip)
+            [Linux Build](https://github.com/${{ github.repository }}/releases/download/release-${{ github.run_number }}/linux-build.zip)
+            [macOS Build](https://github.com/${{ github.repository }}/releases/download/release-${{ github.run_number }}/macos-build.zip)
+            
+            [View Release](https://github.com/${{ github.repository }}/releases/tag/release-${{ github.run_number }})
+
+      - name: Send Discord notification
+        uses: Ilshidur/action-discord@master
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        with:
+          args: |
+            🚀 **New Release Published!**
+            
+            Version: Release ${{ github.run_number }}
+            PR: #${{ github.event.pull_request.number }}
+            
+            **Download Links:**
+            [Windows Build](https://github.com/${{ github.repository }}/releases/download/release-${{ github.run_number }}/windows-build.zip)
+            [Linux Build](https://github.com/${{ github.repository }}/releases/download/release-${{ github.run_number }}/linux-build.zip)
+            [macOS Build](https://github.com/${{ github.repository }}/releases/download/release-${{ github.run_number }}/macos-build.zip)
+            
+            [View Release](https://github.com/${{ github.repository }}/releases/tag/release-${{ github.run_number }}) 
