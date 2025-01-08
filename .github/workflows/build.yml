@@ -1,0 +1,78 @@
+name: Web Build and Deploy
+
+permissions:
+  contents: write
+  pull-requests: read
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  build-web:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: develop
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Enable web
+        run: flutter config --enable-web
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Build web
+        run: flutter build web --release
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./build/web
+          force_orphan: true
+
+      - name: Send Telegram Notification
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_CHAT_ID }}
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          format: markdown
+          message: |
+            🔨 *New Web Build Deployed*
+            
+            📅 Date: ${{ github.event.head_commit.timestamp }}
+            
+            📝 Commit Message:
+            ```
+            ${{ github.event.head_commit.message }}
+            ```
+            
+            🌐 Web version available at:
+            https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}
+
+      - name: Send Discord Notification
+        uses: Ilshidur/action-discord@master
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        with:
+          args: |
+            🔨 **New Web Build Deployed**
+            
+            📅 Date: ${{ github.event.head_commit.timestamp }}
+            
+            📝 Commit Message:
+            ```
+            ${{ github.event.head_commit.message }}
+            ```
+            
+            🌐 Web version available at:
+            https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }} 
