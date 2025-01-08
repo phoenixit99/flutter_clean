@@ -47,17 +47,7 @@ jobs:
           token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           format: markdown
           message: |
-            🔨 *New Web Build Deployed*
-            
-            📅 Date: ${{ github.event.head_commit.timestamp }}
-            
-            📝 Commit Message:
-            ```
-            ${{ github.event.head_commit.message }}
-            ```
-            
-            🌐 Web version available at:
-            https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}
+            🔨� https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}
 
       - name: Send Discord Notification
         uses: Ilshidur/action-discord@master
@@ -65,14 +55,4 @@ jobs:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         with:
           args: |
-            🔨 **New Web Build Deployed**
-            
-            📅 Date: ${{ github.event.head_commit.timestamp }}
-            
-            📝 Commit Message:
-            ```
-            ${{ github.event.head_commit.message }}
-            ```
-            
-            🌐 Web version available at:
-            https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }} 
+            🌐 https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }} 
