@@ -7,7 +7,7 @@ permissions:
 on:
   push:
     branches:
-      - develop
+      - main
 
 jobs:
   build-web:
@@ -15,8 +15,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          ref: develop
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
@@ -31,7 +29,7 @@ jobs:
         run: flutter pub get
 
       - name: Build web
-        run: flutter build web --release
+        run: flutter build web --release --base-href "/${{ github.event.repository.name }}/"
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
