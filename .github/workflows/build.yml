@@ -40,15 +40,6 @@ jobs:
           publish_dir: ./build/web
           force_orphan: true
 
-      - name: Send Telegram Notification
-        uses: appleboy/telegram-action@master
-        with:
-          to: ${{ secrets.TELEGRAM_CHAT_ID }}
-          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          format: markdown
-          message: |
-            🔨� https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}
-
       - name: Send Discord Notification
         uses: Ilshidur/action-discord@master
         env:
@@ -56,3 +47,4 @@ jobs:
         with:
           args: |
             🌐 https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }} 
+            
