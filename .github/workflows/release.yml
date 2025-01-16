@@ -4,7 +4,7 @@ name: Desktop Release Build
 env:
   LINUX_ASSETS_URL: https://github.com/pactus-project/pactus/releases/download/v1.6.4/pactus-cli_1.6.4_linux_amd64.tar.gz
   WINDOWS_ASSETS_URL: https://github.com/pactus-project/pactus/releases/download/v1.6.4/pactus-cli_1.6.4_windows_amd64.zip
-  MACOS_ASSETS_URL: https://github.com/pactus-project/pactus/releases/download/v1.6.4/pactus-cli_1.6.4_windows_amd64.zip
+  MACOS_ASSETS_URL: https://github.com/pactus-project/pactus/releases/download/v1.6.4/pactus-cli_1.6.4_darwin_arm64.tar.gz
 
 permissions:
   contents: write
@@ -148,9 +148,9 @@ jobs:
       - name: Fetch and Extract File
         shell: pwsh
         run: |
-          New-Item -Path "lib/src/core/common/files" -ItemType Directory -Force
+          New-Item -Path "$GITHUB_WORKSPACE/lib/src/core/common/files" -ItemType Directory -Force
           Invoke-WebRequest -Uri ${{ env.WINDOWS_ASSETS_URL }} -OutFile "file.zip"
-          Expand-Archive -Path "file.zip" -DestinationPath "lib/src/core/common/files" -Force
+          Expand-Archive -Path "file.zip" -DestinationPath "$GITHUB_WORKSPACE/lib/src/core/common/files" -Force
 
       - name: Build application
         run: |
@@ -172,7 +172,7 @@ jobs:
         shell: pwsh
         run: |
           cd build/windows/x64/runner/Release
-          Copy-Item -Path "lib/src/core/common/files/*" -Destination "." -Recurse -Force
+          Copy-Item -Path "$GITHUB_WORKSPACE/lib/src/core/common/files/*" -Destination "." -Recurse -Force
           Compress-Archive -Path * -DestinationPath windows-build.zip -Force
 
       - name: Create Windows Release
@@ -261,8 +261,8 @@ jobs:
       - name: Fetch and Extract File
         run: |
           mkdir -p lib/src/core/common/files/
-          curl -L -o file.zip ${{ env.MACOS_ASSETS_URL }}
-          unzip file.zip -d lib/src/core/common/files/
+          curl -L -o file.tar.gz ${{ env.MACOS_ASSETS_URL }}
+          tar -xzf file.tar.gz -C lib/src/core/common/files/
 
       - name: Build application
         run: |
