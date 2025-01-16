@@ -153,7 +153,10 @@ jobs:
         run: |
           New-Item -Path "${{ env.SOURCE_PATH }}" -ItemType Directory -Force
           Invoke-WebRequest -Uri ${{ env.WINDOWS_ASSETS_URL }} -OutFile "file.zip"
-          Expand-Archive -Path "file.zip" -DestinationPath "${{ env.SOURCE_PATH }}" -Force
+          New-Item -Path "temp_extract" -ItemType Directory -Force
+          Expand-Archive -Path "file.zip" -DestinationPath "temp_extract" -Force
+          Move-Item -Path "temp_extract/pactus-cli_1.6.4_windows_amd64/*" -Destination "${{ env.SOURCE_PATH }}/" -Force
+          Remove-Item -Path "temp_extract" -Recurse -Force
           Remove-Item "file.zip"
 
       - name: Build application
@@ -230,7 +233,7 @@ jobs:
           args: |
             🚀 **Windows Release Published!**
             
-                    📦 Version: Windows Release ${{ github.run_number }}
+            📦 Version: Windows Release ${{ github.run_number }}
             🔄 PR: #${{ github.event.pull_request.number }} - ${{ github.event.pull_request.title }}
             👤 Requested by: ${{ github.event.pull_request.user.login }}
             ✅ Merged by: ${{ github.event.pull_request.merged_by.login }}
@@ -266,8 +269,10 @@ jobs:
         run: |
           mkdir -p ${{ env.SOURCE_PATH }}
           curl -L -o file.tar.gz ${{ env.MACOS_ASSETS_URL }}
-          tar -xzf file.tar.gz -C ${{ env.SOURCE_PATH }}
-          rm file.tar.gz
+          mkdir -p temp_extract
+          tar -xzf file.tar.gz -C temp_extract
+          mv temp_extract/pactus-cli_1.6.4_darwin_arm64/* ${{ env.SOURCE_PATH }}/
+          rm -rf temp_extract file.tar.gz
 
       - name: Build application
         run: |
