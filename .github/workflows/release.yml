@@ -53,8 +53,11 @@ jobs:
         run: |
           mkdir -p ${{ env.SOURCE_PATH }}
           curl -L -o file.tar.gz ${{ env.LINUX_ASSETS_URL }}
-          tar -xzf file.tar.gz -C ${{ env.SOURCE_PATH }}
-          rm file.tar.gz
+          mkdir -p temp_extract
+          tar -xzf file.tar.gz -C temp_extract
+          cp temp_extract/pactus-cli_1.6.4_linux_amd64/* ${{ env.SOURCE_PATH }}/
+          rm -rf temp_extract file.tar.gz
+          ls -la ${{ env.SOURCE_PATH }}
 
       - name: Build application
         run: flutter build linux --release
@@ -155,9 +158,10 @@ jobs:
           Invoke-WebRequest -Uri ${{ env.WINDOWS_ASSETS_URL }} -OutFile "file.zip"
           New-Item -Path "temp_extract" -ItemType Directory -Force
           Expand-Archive -Path "file.zip" -DestinationPath "temp_extract" -Force
-          Move-Item -Path "temp_extract/pactus-cli_1.6.4_windows_amd64/*" -Destination "${{ env.SOURCE_PATH }}/" -Force
+          Copy-Item -Path "temp_extract/pactus-cli_1.6.4_windows_amd64/*" -Destination "${{ env.SOURCE_PATH }}/" -Force
           Remove-Item -Path "temp_extract" -Recurse -Force
           Remove-Item "file.zip"
+          Get-ChildItem "${{ env.SOURCE_PATH }}"
 
       - name: Build application
         run: |
@@ -271,8 +275,9 @@ jobs:
           curl -L -o file.tar.gz ${{ env.MACOS_ASSETS_URL }}
           mkdir -p temp_extract
           tar -xzf file.tar.gz -C temp_extract
-          mv temp_extract/pactus-cli_1.6.4_darwin_arm64/* ${{ env.SOURCE_PATH }}/
+          cp -r temp_extract/pactus-cli_1.6.4_darwin_arm64/* ${{ env.SOURCE_PATH }}/
           rm -rf temp_extract file.tar.gz
+          ls -la ${{ env.SOURCE_PATH }}
 
       - name: Build application
         run: |
