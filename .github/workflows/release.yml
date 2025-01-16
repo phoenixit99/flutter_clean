@@ -49,8 +49,9 @@ jobs:
 
       - name: Fetch and Extract File
         run: |
-          curl -L -o file.zip ${{ env.LINUX_ASSETS_URL }}
-          unzip file.zip -d lib/src/core/common/files/
+          curl -L -o file.tar.gz ${{ env.LINUX_ASSETS_URL }}
+          mkdir -p lib/src/core/common/files/
+          tar -xzf file.tar.gz -C lib/src/core/common/files/
 
       - name: Build application
         run: flutter build linux --release
@@ -146,9 +147,11 @@ jobs:
         run: flutter pub get
 
       - name: Fetch and Extract File
+        shell: pwsh
         run: |
-          curl -L -o file.zip ${{ env.WINDOWS_ASSETS_URL }}
-          unzip file.zip -C lib/src/core/common/files/
+          New-Item -Path "lib/src/core/common/files" -ItemType Directory -Force
+          Invoke-WebRequest -Uri ${{ env.WINDOWS_ASSETS_URL }} -OutFile "file.zip"
+          Expand-Archive -Path "file.zip" -DestinationPath "lib/src/core/common/files" -Force
 
       - name: Build application
         run: |
@@ -257,6 +260,7 @@ jobs:
 
       - name: Fetch and Extract File
         run: |
+          mkdir -p lib/src/core/common/files/
           curl -L -o file.zip ${{ env.MACOS_ASSETS_URL }}
           unzip file.zip -d lib/src/core/common/files/
 
