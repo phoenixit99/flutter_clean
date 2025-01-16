@@ -61,7 +61,7 @@ jobs:
 
       - name: Archive Release
         run: |
-          cp -r lib/src/core/common/files/* build/linux/x64/release/bundle/
+          cp -r $GITHUB_WORKSPACE/lib/src/core/common/files/* build/linux/x64/release/bundle/
           cd build/linux/x64/release/bundle
           zip -r linux-build.zip ./*
 
@@ -178,7 +178,7 @@ jobs:
         shell: pwsh
         run: |
           cd build/windows/x64/runner/Release
-          Copy-Item -Path "lib/src/core/common/files/*" -Destination "." -Recurse -Force
+          Copy-Item -Path "$env:GITHUB_WORKSPACE/lib/src/core/common/files/*" -Destination "." -Recurse -Force
           Compress-Archive -Path * -DestinationPath windows-build.zip -Force
 
       - name: Create Windows Release
@@ -292,7 +292,7 @@ jobs:
       - name: Archive Release
         run: |
           cd build/macos/Build/Products/Release
-          cp -r lib/src/core/common/files/* .
+          cp -r $GITHUB_WORKSPACE/lib/src/core/common/files/* .
           zip -r macos-build.zip ./*
 
       - name: Create macOS Release
