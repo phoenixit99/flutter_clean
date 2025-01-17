@@ -23,6 +23,33 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.24.5'
+      - name: Download and setup Pactus daemon
+        run: |
+          # Create directory for pactus
+          mkdir -p $HOME/.pactus
+          
+          # Download latest pactus-daemon release
+          curl -L -o pactus-daemon.tar.gz $(curl -s https://api.github.com/repos/pactus-project/pactus/releases/latest | grep "browser_download_url.*linux-amd64.tar.gz" | cut -d '"' -f 4)
+          
+          # Extract the daemon
+          tar xzf pactus-daemon.tar.gz
+          
+          # Move binary to path
+          sudo mv pactus-daemon /usr/local/bin/
+          
+          # Make it executable
+          sudo chmod +x /usr/local/bin/pactus-daemon
+          
+          # Verify installation
+          pactus-daemon version
+
+      - name: Start Pactus daemon
+        run: |
+          # Start daemon in background
+          pactus-daemon start &
+          # Wait for daemon to start
+          sleep 10
+
       - name: Install dependencies
         run: flutter pub get
 
