@@ -25,30 +25,19 @@ jobs:
           flutter-version: '3.24.5'
       - name: Download and setup Pactus daemon
         run: |
-          # Create directory for pactus
-          mkdir -p $HOME/.pactus
+          # Create lib/assets directory if it doesn't exist
+          mkdir -p lib/assets/pactus
           
-          # Download latest pactus-daemon release
-          curl -L -o pactus-daemon.tar.gz $(curl -s https://api.github.com/repos/pactus-project/pactus/releases/latest | grep "browser_download_url.*linux-amd64.tar.gz" | cut -d '"' -f 4)
+          # Set the target file path
+          TARGET_FILE="lib/assets/pactus/pactus-cli_1.6.4_darwin_arm64.tar.gz"
           
-          # Extract the daemon
-          tar xzf pactus-daemon.tar.gz
-          
-          # Move binary to path
-          sudo mv pactus-daemon /usr/local/bin/
-          
-          # Make it executable
-          sudo chmod +x /usr/local/bin/pactus-daemon
-          
-          # Verify installation
-          pactus-daemon version
-
-      - name: Start Pactus daemon
-        run: |
-          # Start daemon in background
-          pactus-daemon start &
-          # Wait for daemon to start
-          sleep 10
+          # Check if file already exists
+          if [ ! -f "$TARGET_FILE" ]; then
+            echo "Downloading Pactus daemon..."
+            curl -L -o "$TARGET_FILE" "https://github.com/pactus-project/pactus/releases/download/v1.6.4/pactus-cli_1.6.4_darwin_arm64.tar.gz"
+          else
+            echo "Pactus daemon file already exists, skipping download"
+          fi
 
       - name: Install dependencies
         run: flutter pub get

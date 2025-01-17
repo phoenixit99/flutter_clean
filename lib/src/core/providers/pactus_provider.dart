@@ -24,8 +24,11 @@ class PactusProvider extends ChangeNotifier {
   }
 
   Future<String> get _pactusPath async {
-    final appDocDir = await getApplicationDocumentsDirectory();
-    return path.join(appDocDir.path, '.pactus');
+    // Use application support directory for macOS
+    final appSupportDir = await getApplicationSupportDirectory();
+    final pactusDir = path.join(appSupportDir.path, 'pactus');
+    _log('Using pactus directory: $pactusDir');
+    return pactusDir;
   }
 
   Future<void> _downloadWithProgress(String url, String savePath) async {
