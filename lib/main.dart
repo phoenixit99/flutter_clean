@@ -42,18 +42,35 @@ class _HomeScreenState extends State<HomeScreen> {
   String message = '';
 
   Future<void> checkFile() async {
-    final directory = await getApplicationSupportDirectory();
+        final directory = await getApplicationSupportDirectory();
     final file = File('${directory.path}/pactus-cli_1.6.4_darwin_arm64.tar.gz');
 
+    String message; // Variable to hold the message
+
     if (await file.exists()) {
-      setState(() async {
-        message = 'Pactus CLI file exists! File size: ${await file.length()} bytes';
-      });
+      message = 'Pactus CLI file exists! File size: ${await file.length()} bytes';
     } else {
-      setState(() {
-        message = 'Pactus CLI file does not exist. Expected path: ${file.absolute.path}';
-      });
+      message = 'Pactus CLI file does not exist. Expected path: ${file.absolute.path}';
     }
+
+    // Show dialog with the message
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('File Check'),
+          content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
   @override
   Widget build(BuildContext context) {
