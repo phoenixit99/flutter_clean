@@ -15,8 +15,15 @@ void main() {
   );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  String message = '';
 
   @override
   Widget build(BuildContext context) {
@@ -26,17 +33,23 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       home: Scaffold(
-        body: const WalletScreen(),
+        body: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(message),
+            const WalletScreen(),
+          ],
+        ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             final file = File('lib/assets/pactus/pactus-cli_1.6.4_darwin_arm64.tar.gz');
-            if (file.existsSync()) {
-              print('Pactus CLI file exists!');
-              print('File size: ${file.lengthSync()} bytes');
-            } else {
-              print('Pactus CLI file does not exist');
-              print('Expected path: ${file.absolute.path}');
-            }
+            setState(() {
+              if (file.existsSync()) {
+                message = 'Pactus CLI file exists! File size: ${file.lengthSync()} bytes';
+              } else {
+                message = 'Pactus CLI file does not exist. Expected path: ${file.absolute.path}';
+              }
+            });
           },
           child: const Icon(Icons.check),
           tooltip: 'Check Pactus CLI',
