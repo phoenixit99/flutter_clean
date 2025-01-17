@@ -2,9 +2,11 @@ name: Desktop Release Build
 
 # Add environment variables at the top level
 env:
+  PACTUS_VERSION: "v1.6.4"
   LINUX_ASSETS_URL: https://github.com/pactus-project/pactus/releases/download/v1.6.4/pactus-cli_1.6.4_linux_amd64.tar.gz
   WINDOWS_ASSETS_URL: https://github.com/pactus-project/pactus/releases/download/v1.6.4/pactus-cli_1.6.4_windows_amd64.zip
-  MACOS_ASSETS_URL: https://github.com/pactus-project/pactus/releases/download/v1.6.4/pactus-cli_1.6.4_windows_amd64.zip
+  MACOS_ASSETS_URL: https://github.com/pactus-project/pactus/releases/download/v1.6.4/pactus-cli_1.6.4_darwin_arm64.tar.gz
+  SOURCE_PATH: lib/src/core/common/files
 
 permissions:
   contents: write
@@ -49,18 +51,22 @@ jobs:
 
       - name: Fetch and Extract File
         run: |
-          curl -L -o file.zip ${{ env.LINUX_ASSETS_URL }}
-          unzip file.zip -d lib/src/core/common/files/
+          mkdir -p ${{ env.SOURCE_PATH }}
+          curl -L -o file.tar.gz ${{ env.LINUX_ASSETS_URL }}
+          mkdir -p temp_extract
+          tar -xzf file.tar.gz -C temp_extract
+          cp temp_extract/pactus-cli_1.6.4_linux_amd64/* ${{ env.SOURCE_PATH }}/
+          rm -rf temp_extract file.tar.gz
+          ls -la ${{ env.SOURCE_PATH }}
 
       - name: Build application
         run: flutter build linux --release
 
       - name: Archive Release
-        uses: thedoctor0/zip-release@master
-        with:
-          type: 'zip'
-          filename: 'linux-build.zip'
-          directory: build/linux/x64/release/bundle
+        run: |
+          cp -r ${{ env.SOURCE_PATH }}/* build/linux/x64/release/bundle/
+          cd build/linux/x64/release/bundle
+          zip -r linux-build.zip ./*
 
       - name: Create Linux Release
         id: create_linux_release
@@ -146,9 +152,16 @@ jobs:
         run: flutter pub get
 
       - name: Fetch and Extract File
+        shell: pwsh
         run: |
-          curl -L -o file.zip ${{ env.WINDOWS_ASSETS_URL }}
-          unzip file.zip -C lib/src/core/common/files/
+          New-Item -Path "${{ env.SOURCE_PATH }}" -ItemType Directory -Force
+          Invoke-WebRequest -Uri ${{ env.WINDOWS_ASSETS_URL }} -OutFile "file.zip"
+          New-Item -Path "temp_extract" -ItemType Directory -Force
+          Expand-Archive -Path "file.zip" -DestinationPath "temp_extract" -Force
+          Copy-Item -Path "temp_extract/pactus-cli_1.6.4_windows_amd64/*" -Destination "${{ env.SOURCE_PATH }}/" -Force
+          Remove-Item -Path "temp_extract" -Recurse -Force
+          Remove-Item "file.zip"
+          Get-ChildItem "${{ env.SOURCE_PATH }}"
 
       - name: Build application
         run: |
@@ -167,10 +180,11 @@ jobs:
           }
 
       - name: Archive Release
-        shell: bash
+        shell: pwsh
         run: |
           cd build/windows/x64/runner/Release
-          7z a -tzip windows-build.zip ./*
+          Copy-Item -Path "${{ env.SOURCE_PATH }}/*" -Destination "." -Recurse -Force
+          Compress-Archive -Path * -DestinationPath windows-build.zip -Force
 
       - name: Create Windows Release
         id: create_windows_release
@@ -223,7 +237,7 @@ jobs:
           args: |
             🚀 **Windows Release Published!**
             
-                    📦 Version: Windows Release ${{ github.run_number }}
+            📦 Version: Windows Release ${{ github.run_number }}
             🔄 PR: #${{ github.event.pull_request.number }} - ${{ github.event.pull_request.title }}
             👤 Requested by: ${{ github.event.pull_request.user.login }}
             ✅ Merged by: ${{ github.event.pull_request.merged_by.login }}
@@ -257,8 +271,13 @@ jobs:
 
       - name: Fetch and Extract File
         run: |
-          curl -L -o file.zip ${{ env.MACOS_ASSETS_URL }}
-          unzip file.zip -d lib/src/core/common/files/
+          mkdir -p ${{ env.SOURCE_PATH }}
+          curl -L -o file.tar.gz ${{ env.MACOS_ASSETS_URL }}
+          mkdir -p temp_extract
+          tar -xzf file.tar.gz -C temp_extract
+          cp -r temp_extract/pactus-cli_1.6.4_darwin_arm64/* ${{ env.SOURCE_PATH }}/
+          rm -rf temp_extract file.tar.gz
+          ls -la ${{ env.SOURCE_PATH }}
 
       - name: Build application
         run: |
@@ -279,7 +298,8 @@ jobs:
       - name: Archive Release
         run: |
           cd build/macos/Build/Products/Release
-          zip -r macos-build.zip *.app
+          cp -r ${{ env.SOURCE_PATH }}/* .
+          zip -r macos-build.zip ./*
 
       - name: Create macOS Release
         id: create_macos_release

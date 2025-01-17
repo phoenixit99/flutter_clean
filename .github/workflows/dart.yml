@@ -23,6 +23,22 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.24.5'
+      - name: Download and setup Pactus daemon
+        run: |
+          # Create lib/assets directory if it doesn't exist
+          mkdir -p lib/assets/pactus
+          
+          # Set the target file path
+          TARGET_FILE="lib/assets/pactus/pactus-cli_1.6.4_darwin_arm64.tar.gz"
+          
+          # Check if file already exists
+          if [ ! -f "$TARGET_FILE" ]; then
+            echo "Downloading Pactus daemon..."
+            curl -L -o "$TARGET_FILE" "https://github.com/pactus-project/pactus/releases/download/v1.6.4/pactus-cli_1.6.4_darwin_arm64.tar.gz"
+          else
+            echo "Pactus daemon file already exists, skipping download"
+          fi
+
       - name: Install dependencies
         run: flutter pub get
 
