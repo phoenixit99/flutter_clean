@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'src/core/providers/pactus_provider.dart';
 import 'src/features/wallet/screens/wallet_screen.dart';
 import 'dart:io';
+import 'package:path_provider/path_provider.dart';
 
 void main() {
   runApp(
@@ -40,52 +41,27 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   String message = '';
 
+  Future<void> checkFile() async {
+    final directory = await getApplicationSupportDirectory();
+    final file = File('${directory.path}/pactus-cli_1.6.4_darwin_arm64.tar.gz');
+
+    if (await file.exists()) {
+      setState(() async {
+        message = 'Pactus CLI file exists! File size: ${await file.length()} bytes';
+      });
+    } else {
+      setState(() {
+        message = 'Pactus CLI file does not exist. Expected path: ${file.absolute.path}';
+      });
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: const WalletScreen(),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          final file = File('lib/assets/pactus/pactus-cli_1.6.4_darwin_arm64.tar.gz');
-          setState(() {
-            if (file.existsSync()) {
-              showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    title: const Text('File Check'),
-                    content: Text('Pactus CLI file exists! File size: ${file.lengthSync()} bytes'),
-                    actions: <Widget>[
-                      TextButton(
-                        child: const Text('OK'),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                      ),
-                    ],
-                  );
-                },
-              );
-            } else {
-              showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    title: const Text('File Check'),
-                    content: Text('Pactus CLI file does not exist. Expected path: ${file.absolute.path}'),
-                    actions: <Widget>[
-                      TextButton(
-                        child: const Text('OK'),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                      ),
-                    ],
-                  );
-                },
-              );
-            }
-          });
+          checkFile();
         },
         child: const Icon(Icons.check),
         tooltip: 'Check Pactus CLI',

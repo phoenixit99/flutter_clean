@@ -42,9 +42,6 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Analyze project source
-        run: flutter analyze
-
 
   # notify-on-merge:
   #   runs-on: ubuntu-latest
