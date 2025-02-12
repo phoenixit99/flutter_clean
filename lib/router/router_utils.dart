@@ -15,8 +15,6 @@ class RouteUtils {
         return '/profile';
       case AppRoute.bottomBar:
         return '/bottomBar';
-      default:
-        return '/';
     }
   }
 }
